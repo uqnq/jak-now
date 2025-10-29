@@ -1,0 +1,72 @@
+---
+layout: default
+---
+
+<article class="post">
+  <h1>{{ page.title }}</h1>
+
+  <div class="entry">
+  {% assign paragraphs = content | split: '</p>' %}
+  {% assign halfway = paragraphs.size | divided_by: 2 %}
+
+  {% for paragraph in paragraphs %}
+    {{ paragraph }}</p>
+
+    {% if forloop.index == 2 or forloop.index == halfway %}
+      {% assign all_posts = site.posts | where_exp: "p", "p.url != page.url" %}
+      {% assign random_index = site.time | date: "%s" | plus: forloop.index | modulo: all_posts.size %}
+      {% assign random_post = all_posts[random_index] %}
+
+      {% if random_post %}
+        <p class="related"><strong>Baca juga:</strong>
+        <a href="{{ random_post.url | relative_url }}">{{ random_post.title }}</a></p>
+      {% endif %}
+    {% endif %}
+  {% endfor %}
+</div>
+
+
+
+
+  {% assign current_index = 0 %}
+{% for post in site.posts %}
+  {% if post.url == page.url %}
+    {% assign current_index = forloop.index0 %}
+  {% endif %}
+{% endfor %}
+
+{% assign start_index = current_index | minus: 1 %}
+{% assign end_index = current_index | plus: 1 %}
+
+<h3>Related Posts</h3>
+<ul>
+{% for i in (start_index..end_index) %}
+  {% assign related_post = site.posts[i] %}
+  {% if related_post and related_post.url != page.url %}
+    <li>
+      <a href="{{ related_post.url | relative_url }}">{{ related_post.title }}</a>
+    </li>
+  {% endif %}
+{% endfor %}
+</ul>
+  
+Random :
+<ul>
+  {% assign shuffled_posts = site.posts | sample: 5 %}
+  {% for post in shuffled_posts %}
+    {% if post.url != page.url %}
+      <li>
+        <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+      </li>
+    {% endif %}
+  {% endfor %}
+</ul>
+
+
+
+  <div class="date">
+    Written on {{ page.date | date: "%B %e, %Y" }}
+  </div>
+
+  {% include disqus.html %}
+</article>
